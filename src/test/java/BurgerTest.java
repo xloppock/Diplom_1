@@ -87,7 +87,6 @@ public class BurgerTest {
 
         assertEquals("Цена должна быть рассчитана правильно", 280.0f, actualPrice, 0.01f);
 
-        // Verify - проверяем, что методы были вызваны
         verify(mockBun, times(1)).getPrice();
         verify(mockIngredient1, times(1)).getPrice();
         verify(mockIngredient2, times(1)).getPrice();
@@ -118,5 +117,91 @@ public class BurgerTest {
         assertTrue("Чек должен содержать цену", actualReceipt.contains("Price: 500"));
         assertTrue("В чеке должены быть правильные разделители", actualReceipt.contains("(===="));
 
+    }
+    @Test
+    public void testGetPriceWithOnlyBun() {
+        when(mockBun.getPrice()).thenReturn(100.0f);
+        burger.setBuns(mockBun);
+
+        float price = burger.getPrice();
+        assertEquals(200.0f, price, 0.001f);
+        verify(mockBun, times(1)).getPrice();
+    }
+
+    @Test
+    public void testGetPriceWithNoBun() {
+        try {
+            burger.getPrice();
+            fail("Should throw NullPointerException when bun is null");
+        } catch (NullPointerException e) {
+
+        }
+    }
+
+    @Test
+    public void testMoveIngredientSameIndex() {
+        burger.ingredients.add(mockIngredient1);
+        burger.ingredients.add(mockIngredient2);
+
+        burger.moveIngredient(0, 0);
+
+        assertEquals(2, burger.ingredients.size());
+        assertEquals(mockIngredient1, burger.ingredients.get(0));
+        assertEquals(mockIngredient2, burger.ingredients.get(1));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testMoveIngredientInvalidIndex() {
+        burger.ingredients.add(mockIngredient1);
+        burger.moveIngredient(0, 5);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testRemoveIngredientInvalidIndex() {
+        burger.removeIngredient(0);
+    }
+
+    @Test
+    public void testGetReceiptWithEmptyIngredients() {
+        when(mockBun.getName()).thenReturn("white bun");
+        when(mockBun.getPrice()).thenReturn(200.0f);
+
+        burger.setBuns(mockBun);
+
+        String receipt = burger.getReceipt();
+
+        assertTrue(receipt.contains("(==== white bun ====)"));
+        assertTrue(receipt.contains("Price: 400"));
+        assertFalse(receipt.contains("= sauce"));
+        assertFalse(receipt.contains("= filling"));
+    }
+
+    @Test
+    public void testGetReceiptFormattedPrice() {
+        when(mockBun.getName()).thenReturn("test bun");
+        when(mockBun.getPrice()).thenReturn(150.5f);
+
+        burger.setBuns(mockBun);
+
+        String receipt = burger.getReceipt();
+        assertTrue(receipt.contains("301.0") || receipt.contains("301,0"));
+    }
+
+    @Test
+    public void testIngredientTypeLowerCaseInReceipt() {
+        when(mockBun.getName()).thenReturn("bun");
+        when(mockIngredient1.getType()).thenReturn(SAUCE);
+        when(mockIngredient1.getName()).thenReturn("Hot Sauce");
+        when(mockIngredient2.getType()).thenReturn(FILLING);
+        when(mockIngredient2.getName()).thenReturn("Cutlet");
+
+        burger.setBuns(mockBun);
+        burger.addIngredient(mockIngredient1);
+        burger.addIngredient(mockIngredient2);
+
+        String receipt = burger.getReceipt();
+
+        assertTrue(receipt.contains("= sauce Hot Sauce ="));
+        assertTrue(receipt.contains("= filling Cutlet ="));
     }
 }

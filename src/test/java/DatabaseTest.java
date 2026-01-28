@@ -65,4 +65,28 @@ public class DatabaseTest {
         assertEquals("sausage", ingredients.get(5).getName());
         assertEquals(300.0f, ingredients.get(5).getPrice(), 0.001f);
     }
+
+    @Test
+    public void testDatabaseConstructor() {
+        Database db = new Database();
+        assertNotNull(db);
+
+        assertNotNull(db.availableBuns());
+        assertNotNull(db.availableIngredients());
+    }
+
+    @Test
+    public void testDatabaseImmutableLists() {
+        List<Bun> buns = database.availableBuns();
+        List<Ingredient> ingredients = database.availableIngredients();
+
+        int originalBunsSize = buns.size();
+        int originalIngredientsSize = ingredients.size();
+
+        buns.clear();
+        ingredients.clear();
+
+        assertEquals(originalBunsSize, database.availableBuns().size());
+        assertEquals(originalIngredientsSize, database.availableIngredients().size());
+    }
 }

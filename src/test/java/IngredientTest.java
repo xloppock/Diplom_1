@@ -61,4 +61,23 @@ public class IngredientTest {
 
         assertEquals(expectedPrice, ingredient.price, 0.001f);
     }
+
+    @Test
+    public void testIngredientWithZeroPrice() {
+        Ingredient ingredient = new Ingredient(expectedType, expectedName, 0.0f);
+        assertEquals(0.0f, ingredient.getPrice(), 0.001f);
+    }
+
+    @Test
+    public void testIngredientWithNegativePrice() {
+        Ingredient ingredient = new Ingredient(expectedType, expectedName, -100.0f);
+        assertEquals(-100.0f, ingredient.getPrice(), 0.001f);
+    }
+
+    @Test
+    public void testIngredientWithSpecialCharactersName() {
+        String specialName = "Special & Sauce #1!";
+        Ingredient ingredient = new Ingredient(IngredientType.SAUCE, specialName, 100.0f);
+        assertEquals(specialName, ingredient.getName());
+    }
 }

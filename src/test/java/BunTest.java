@@ -58,4 +58,36 @@ public class BunTest {
         assertNull(bun.name);
         assertEquals(100.0f, bun.getPrice(), 0.001f);
     }
+
+    @Test
+    public void testBunWithEmptyName() {
+        Bun bun = new Bun("", 100.0f);
+        assertEquals("", bun.getName());
+        assertEquals("", bun.name);
+        assertEquals(100.0f, bun.getPrice(), 0.001f);
+    }
+
+    @Test
+    public void testBunWithZeroPrice() {
+        Bun bun = new Bun("Zero Bun", 0.0f);
+        assertEquals("Zero Bun", bun.getName());
+        assertEquals(0.0f, bun.getPrice(), 0.001f);
+        assertEquals(0.0f, bun.price, 0.001f);
+    }
+
+    @Test
+    public void testBunWithNegativePrice() {
+        Bun bun = new Bun("Negative Bun", -50.0f);
+        assertEquals("Negative Bun", bun.getName());
+        assertEquals(-50.0f, bun.getPrice(), 0.001f);
+        assertEquals(-50.0f, bun.price, 0.001f);
+    }
+
+    @Test
+    public void testBunWithMaxFloatPrice() {
+        Bun bun = new Bun("Expensive Bun", Float.MAX_VALUE);
+        assertEquals("Expensive Bun", bun.getName());
+        assertEquals(Float.MAX_VALUE, bun.getPrice(), 0.001f);
+        assertEquals(Float.MAX_VALUE, bun.price, 0.001f);
+    }
 }

@@ -18,10 +18,13 @@ public class TestData {
     public static List<Object[]> getAdditionalBuns() {
         return Arrays.asList(new Object[][]{
                 {"", 0.0f},
+                {" ", 0.0f},
                 {"Тестовая", -50.0f},
                 {null, 100.0f},
-                {"Очень длинное название", 999.99f},
-                {"Булочка с символом $%^", 150.5f}
+                {"Очень длинное название булочки", 999.99f},
+                {"Булочка с символом $%^", 150.5f},
+                {"Bun\nwith\nnewlines", 100.0f},
+                {"Bun\twith\ttabs", 100.0f},
         });
     }
 
@@ -49,6 +52,7 @@ public class TestData {
     public static List<Object[]> getAdditionalIngredients() {
         return Arrays.asList(new Object[][]{
                 {IngredientType.SAUCE, "", 0.0f},
+                {IngredientType.SAUCE, " ", 0.0f},
                 {IngredientType.SAUCE, null, 100.0f},
                 {IngredientType.SAUCE, "Соус", -50.0f},
                 {IngredientType.SAUCE, "Очень длинное название соуса для теста", 150.5f},
