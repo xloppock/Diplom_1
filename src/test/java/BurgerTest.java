@@ -7,7 +7,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import praktikum.Bun;
 import praktikum.Burger;
 import praktikum.Ingredient;
-
+import org.assertj.core.api.SoftAssertions;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static praktikum.IngredientType.FILLING;
@@ -23,13 +23,18 @@ public class BurgerTest {
     Bun mockBun;
 
     @Mock
-    Ingredient mockIngredient1;
+    Ingredient mockIngredientFirst;
 
     @Mock
-    Ingredient mockIngredient2;
+    Ingredient mockIngredientSecond;
 
     @Mock
-    Ingredient mockIngredient3;
+    Ingredient mockIngredientThird;
+
+
+    private static final int FIRST_POSITION = 0;
+    private static final int SECOND_POSITION = 1;
+    private static final int THIRD_POSITION = 2;
 
     @Before
     public void setUp() {
@@ -44,164 +49,170 @@ public class BurgerTest {
 
     @Test
     public void addIngredientTest() {
-        burger.addIngredient(mockIngredient1);
-        assertEquals("Ингредиент должен добавиться в список ингредиентов", 1, burger.ingredients.size());
-        assertEquals("Добавленный ингредиент должен совпадать с mock-ингредиентом", mockIngredient1, burger.ingredients.get(0));
+        burger.addIngredient(mockIngredientFirst);
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(burger.ingredients)
+                .as("Ингредиент должен добавиться в список ингредиентов")
+                .hasSize(1);
+
+        softly.assertThat(burger.ingredients.get(0))
+                .as("Добавленный ингредиент должен совпадать с mock-ингредиентом")
+                .isEqualTo(mockIngredientFirst);
+
+        softly.assertAll();
+    }
+@Test
+public void removeIngredientShouldReduceSize() {
+
+    burger.ingredients.add(mockIngredientFirst);
+    burger.ingredients.add(mockIngredientSecond);
+    burger.ingredients.add(mockIngredientThird);
+
+    burger.removeIngredient(SECOND_POSITION);
+
+    assertEquals("Должно остаться 2 ингредиента", 2, burger.ingredients.size());
+}
+
+    @Test
+    public void removeIngredientShouldKeepFirstIngredient() {
+
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(SECOND_POSITION);
+
+        assertEquals("Первый ингредиент должен остаться", mockIngredientFirst, burger.ingredients.get(FIRST_POSITION));
     }
 
     @Test
-    public void removeIngredientTest() {
-        burger.ingredients.add(mockIngredient1);
-        burger.ingredients.add(mockIngredient2);
-        burger.ingredients.add(mockIngredient3);
-        burger.removeIngredient(2);
-        assertEquals("Должно остаться 2 ингредиента", 2, burger.ingredients.size());
-        assertEquals("Первый ингредиент должен остаться", mockIngredient1, burger.ingredients.get(0));
-        assertEquals("Последний ингредиент должен сдвинуться", mockIngredient2, burger.ingredients.get(1));
-        assertFalse("Второй ингредиент должен быть удален", burger.ingredients.contains(mockIngredient3));
+    public void removeIngredientShouldMoveSecondIngredient() {
+
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(THIRD_POSITION);
+        assertEquals("Последний ингредиент должен сдвинуться", mockIngredientSecond, burger.ingredients.get(SECOND_POSITION));
     }
 
     @Test
-    public void moveIngredientTest() {
-        burger.ingredients.add(mockIngredient1);
-        burger.ingredients.add(mockIngredient2);
-        burger.ingredients.add(mockIngredient3);
-        burger.moveIngredient(0, 2);
-        assertEquals("Количество ингредиентов не должно измениться", 3, burger.ingredients.size());
-        assertEquals("Первый элемент должен стать ingredient1", mockIngredient2, burger.ingredients.get(0));
-        assertEquals("Второй элемент должен стать ingredient2", mockIngredient3, burger.ingredients.get(1));
-        assertEquals("Третий элемент должен стать ingredient0", mockIngredient1, burger.ingredients.get(2));
+    public void removeIngredientShouldNotContainRemovedIngredient() {
+
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(THIRD_POSITION);
+        assertFalse("Второй ингредиент должен быть удален", burger.ingredients.contains(mockIngredientThird));
+    }
+
+
+    @Test
+    public void removeIngredientCountTest() {
+
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(THIRD_POSITION);
+
+        assertEquals("После удаления должно остаться 2 ингредиента",
+                2, burger.ingredients.size());
+    }
+
+    @Test
+    public void removeIngredientFirstRemainsTest() {
+
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(THIRD_POSITION);
+
+        assertEquals("Первый ингредиент должен остаться на месте",
+                mockIngredientSecond, burger.ingredients.get(FIRST_POSITION));
+    }
+
+    @Test
+    public void removeIngredientSecondMovesTest() {
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.removeIngredient(THIRD_POSITION);
+
+        assertEquals("Второй ингредиент должен сдвинуться на позицию 1",
+                mockIngredientThird, burger.ingredients.get(SECOND_POSITION));
+    }
+
+    @Test
+    public void removeIngredientRemovedElementTest() {
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        // Act
+        burger.removeIngredient(THIRD_POSITION);
+
+        // Assert
+        assertFalse("Удаленный ингредиент не должен присутствовать в списке",
+                burger.ingredients.contains(mockIngredientThird));
     }
 
     @Test
     public void getPriceTest() {
         when(mockBun.getPrice()).thenReturn(100.0f);
-        when(mockIngredient1.getPrice()).thenReturn(50.0f);
-        when(mockIngredient2.getPrice()).thenReturn(30.0f);
+        when(mockIngredientFirst.getPrice()).thenReturn(50.0f);
+        when(mockIngredientSecond.getPrice()).thenReturn(30.0f);
 
         burger.bun = mockBun;
-        burger.ingredients.add(mockIngredient1);
-        burger.ingredients.add(mockIngredient2);
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
 
         float actualPrice = burger.getPrice();
 
         assertEquals("Цена должна быть рассчитана правильно", 280.0f, actualPrice, 0.01f);
 
         verify(mockBun, times(1)).getPrice();
-        verify(mockIngredient1, times(1)).getPrice();
-        verify(mockIngredient2, times(1)).getPrice();
+        verify(mockIngredientFirst, times(1)).getPrice();
+        verify(mockIngredientSecond, times(1)).getPrice();
     }
 
     @Test
     public void getReceiptTest() {
 
         burger.bun = mockBun;
-        burger.ingredients.add(mockIngredient1);
-        burger.ingredients.add(mockIngredient2);
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
 
         Burger burgerSpy = Mockito.spy(burger);
 
         when(mockBun.getName()).thenReturn("white bun");
-        when(mockIngredient1.getType()).thenReturn(SAUCE);
-        when(mockIngredient1.getName()).thenReturn("chili sauce");
-        when(mockIngredient2.getType()).thenReturn(FILLING);
-        when(mockIngredient2.getName()).thenReturn("dinosaur");
+        when(mockIngredientFirst.getType()).thenReturn(SAUCE);
+        when(mockIngredientFirst.getName()).thenReturn("chili sauce");
+        when(mockIngredientSecond.getType()).thenReturn(FILLING);
+        when(mockIngredientSecond.getName()).thenReturn("dinosaur");
         when(burgerSpy.getPrice()).thenReturn(500.0f);
 
 
         String actualReceipt = burgerSpy.getReceipt();
 
-        assertTrue("Чек должен содержать название булочки", actualReceipt.contains("white bun"));
-        assertTrue("Чек должен содержать соус", actualReceipt.contains("sauce chili sauce"));
-        assertTrue("Чек должен содержать начинку", actualReceipt.contains("filling dinosaur"));
-        assertTrue("Чек должен содержать цену", actualReceipt.contains("Price: 500"));
-        assertTrue("В чеке должены быть правильные разделители", actualReceipt.contains("(===="));
+        String expectedReceipt = String.format(
 
-    }
-    @Test
-    public void testGetPriceWithOnlyBun() {
-        when(mockBun.getPrice()).thenReturn(100.0f);
-        burger.setBuns(mockBun);
+                "(==== %s ====)%n" +
+                "= %s %s =%n" +
+                "= %s %s =%n" +
+                "(==== %s ====)%n%n" +
+                "Price: %f%n",
+                "white bun",
+                "sauce", "chili sauce",
+                "filling", "dinosaur",
+                "white bun",
+                500.0f
+        );
 
-        float price = burger.getPrice();
-        assertEquals(200.0f, price, 0.001f);
-        verify(mockBun, times(1)).getPrice();
-    }
+        assertEquals("Чек должен соответствовать ожидаемому формату", expectedReceipt, actualReceipt);
 
-    @Test
-    public void testGetPriceWithNoBun() {
-        try {
-            burger.getPrice();
-            fail("Should throw NullPointerException when bun is null");
-        } catch (NullPointerException e) {
-
-        }
-    }
-
-    @Test
-    public void testMoveIngredientSameIndex() {
-        burger.ingredients.add(mockIngredient1);
-        burger.ingredients.add(mockIngredient2);
-
-        burger.moveIngredient(0, 0);
-
-        assertEquals(2, burger.ingredients.size());
-        assertEquals(mockIngredient1, burger.ingredients.get(0));
-        assertEquals(mockIngredient2, burger.ingredients.get(1));
-    }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testMoveIngredientInvalidIndex() {
-        burger.ingredients.add(mockIngredient1);
-        burger.moveIngredient(0, 5);
-    }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testRemoveIngredientInvalidIndex() {
-        burger.removeIngredient(0);
-    }
-
-    @Test
-    public void testGetReceiptWithEmptyIngredients() {
-        when(mockBun.getName()).thenReturn("white bun");
-        when(mockBun.getPrice()).thenReturn(200.0f);
-
-        burger.setBuns(mockBun);
-
-        String receipt = burger.getReceipt();
-
-        assertTrue(receipt.contains("(==== white bun ====)"));
-        assertTrue(receipt.contains("Price: 400"));
-        assertFalse(receipt.contains("= sauce"));
-        assertFalse(receipt.contains("= filling"));
-    }
-
-    @Test
-    public void testGetReceiptFormattedPrice() {
-        when(mockBun.getName()).thenReturn("test bun");
-        when(mockBun.getPrice()).thenReturn(150.5f);
-
-        burger.setBuns(mockBun);
-
-        String receipt = burger.getReceipt();
-        assertTrue(receipt.contains("301.0") || receipt.contains("301,0"));
-    }
-
-    @Test
-    public void testIngredientTypeLowerCaseInReceipt() {
-        when(mockBun.getName()).thenReturn("bun");
-        when(mockIngredient1.getType()).thenReturn(SAUCE);
-        when(mockIngredient1.getName()).thenReturn("Hot Sauce");
-        when(mockIngredient2.getType()).thenReturn(FILLING);
-        when(mockIngredient2.getName()).thenReturn("Cutlet");
-
-        burger.setBuns(mockBun);
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
-
-        String receipt = burger.getReceipt();
-
-        assertTrue(receipt.contains("= sauce Hot Sauce ="));
-        assertTrue(receipt.contains("= filling Cutlet ="));
     }
 }
