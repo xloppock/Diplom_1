@@ -173,9 +173,42 @@ public void removeIngredientShouldReduceSize() {
         float actualPrice = burger.getPrice();
 
         assertEquals("Цена должна быть рассчитана правильно", 280.0f, actualPrice, 0.01f);
+    }
+
+    @Test
+    public void getPriceTest_CallsBunGetPriceOnce() {
+        when(mockBun.getPrice()).thenReturn(100.0f);
+
+        burger.bun = mockBun;
+
+        burger.getPrice();
 
         verify(mockBun, times(1)).getPrice();
+    }
+
+    @Test
+    public void getPriceTest_CallsFirstIngredientGetPriceOnce() {
+        when(mockBun.getPrice()).thenReturn(100.0f);
+        when(mockIngredientFirst.getPrice()).thenReturn(50.0f);
+
+        burger.bun = mockBun;
+        burger.ingredients.add(mockIngredientFirst);
+
+        burger.getPrice();
+
         verify(mockIngredientFirst, times(1)).getPrice();
+    }
+
+    @Test
+    public void getPriceTest_CallsSecondIngredientGetPriceOnce() {
+        when(mockBun.getPrice()).thenReturn(100.0f);
+        when(mockIngredientSecond.getPrice()).thenReturn(30.0f);
+
+        burger.bun = mockBun;
+        burger.ingredients.add(mockIngredientSecond);
+
+        burger.getPrice();
+
         verify(mockIngredientSecond, times(1)).getPrice();
     }
 
