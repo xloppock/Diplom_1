@@ -8,6 +8,10 @@ import praktikum.Bun;
 import praktikum.Burger;
 import praktikum.Ingredient;
 import org.assertj.core.api.SoftAssertions;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static praktikum.IngredientType.FILLING;
@@ -86,14 +90,14 @@ public void removeIngredientShouldReduceSize() {
     }
 
     @Test
-    public void removeIngredientShouldMoveSecondIngredient() {
+    public void removeIngredientShouldNotMoveSecondIngredient() {
 
         burger.ingredients.add(mockIngredientFirst);
         burger.ingredients.add(mockIngredientSecond);
         burger.ingredients.add(mockIngredientThird);
 
         burger.removeIngredient(THIRD_POSITION);
-        assertEquals("Последний ингредиент должен сдвинуться", mockIngredientSecond, burger.ingredients.get(SECOND_POSITION));
+        assertEquals("Второй ингредиент должен остаться", mockIngredientSecond, burger.ingredients.get(SECOND_POSITION));
     }
 
     @Test
@@ -103,61 +107,18 @@ public void removeIngredientShouldReduceSize() {
         burger.ingredients.add(mockIngredientSecond);
         burger.ingredients.add(mockIngredientThird);
 
-        burger.removeIngredient(THIRD_POSITION);
-        assertFalse("Второй ингредиент должен быть удален", burger.ingredients.contains(mockIngredientThird));
+        burger.removeIngredient(SECOND_POSITION);
+        assertFalse("Второй ингредиент должен быть удален", burger.ingredients.contains(mockIngredientSecond));
     }
-
-
     @Test
-    public void removeIngredientCountTest() {
+    public void removeIngredientShouldMoveLastIngredient() {
 
         burger.ingredients.add(mockIngredientFirst);
         burger.ingredients.add(mockIngredientSecond);
         burger.ingredients.add(mockIngredientThird);
 
-        burger.removeIngredient(THIRD_POSITION);
-
-        assertEquals("После удаления должно остаться 2 ингредиента",
-                2, burger.ingredients.size());
-    }
-
-    @Test
-    public void removeIngredientFirstRemainsTest() {
-
-        burger.ingredients.add(mockIngredientFirst);
-        burger.ingredients.add(mockIngredientSecond);
-        burger.ingredients.add(mockIngredientThird);
-
-        burger.removeIngredient(THIRD_POSITION);
-
-        assertEquals("Первый ингредиент должен остаться на месте",
-                mockIngredientSecond, burger.ingredients.get(FIRST_POSITION));
-    }
-
-    @Test
-    public void removeIngredientSecondMovesTest() {
-        burger.ingredients.add(mockIngredientFirst);
-        burger.ingredients.add(mockIngredientSecond);
-        burger.ingredients.add(mockIngredientThird);
-
-        burger.removeIngredient(THIRD_POSITION);
-
-        assertEquals("Второй ингредиент должен сдвинуться на позицию 1",
-                mockIngredientThird, burger.ingredients.get(SECOND_POSITION));
-    }
-
-    @Test
-    public void removeIngredientRemovedElementTest() {
-        burger.ingredients.add(mockIngredientFirst);
-        burger.ingredients.add(mockIngredientSecond);
-        burger.ingredients.add(mockIngredientThird);
-
-        // Act
-        burger.removeIngredient(THIRD_POSITION);
-
-        // Assert
-        assertFalse("Удаленный ингредиент не должен присутствовать в списке",
-                burger.ingredients.contains(mockIngredientThird));
+        burger.removeIngredient(SECOND_POSITION);
+        assertEquals("Последний ингредиент должен сдвинуться", mockIngredientThird, burger.ingredients.get(SECOND_POSITION));
     }
 
     @Test
@@ -247,5 +208,40 @@ public void removeIngredientShouldReduceSize() {
 
         assertEquals("Чек должен соответствовать ожидаемому формату", expectedReceipt, actualReceipt);
 
+    }
+    @Test
+    public void moveIngredient_FirstToThird() {
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.moveIngredient(0, 2);
+
+        List<Ingredient> expected = Arrays.asList(mockIngredientSecond, mockIngredientThird, mockIngredientFirst);
+        assertEquals(expected, burger.ingredients);
+    }
+
+    @Test
+    public void moveIngredient_ThirdToFirst() {
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.moveIngredient(2, 0);
+
+        List<Ingredient> expected = Arrays.asList(mockIngredientThird, mockIngredientFirst, mockIngredientSecond);
+        assertEquals(expected, burger.ingredients);
+    }
+
+    @Test
+    public void moveIngredient_SecondToThird() {
+        burger.ingredients.add(mockIngredientFirst);
+        burger.ingredients.add(mockIngredientSecond);
+        burger.ingredients.add(mockIngredientThird);
+
+        burger.moveIngredient(1, 2);
+
+        List<Ingredient> expected = Arrays.asList(mockIngredientFirst, mockIngredientThird, mockIngredientSecond);
+        assertEquals(expected, burger.ingredients);
     }
 }
